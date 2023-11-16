@@ -12,9 +12,9 @@ const getAllusers = asyncHandler (async(req, res) => {
 
 
 const createNewUser = asyncHandler (async(req, res) => {
-    const { username, password, filters, roles } = req.body
+    const { username, password, description} = req.body
 
-    if(!username || !password || !Array.isArray(filters) || !filters.length || !Array.isArray(roles) || !roles.length){
+    if(!username || !password){
         return res.status(400).json({ message: 'All fields are required!'})
     }
     
@@ -26,7 +26,7 @@ const createNewUser = asyncHandler (async(req, res) => {
     }
 
     const hashedPwd = await bcrypt.hash(password, 10)
-    const userObject = {username, "password" : hashedPwd, filters, roles}
+    const userObject = {username, "password" : hashedPwd, description}
 
     //Create and store the new user
     const user = await User.create(userObject)
@@ -40,11 +40,11 @@ const createNewUser = asyncHandler (async(req, res) => {
 
 
 const updateUser = asyncHandler (async(req, res) => {
-    const { id, username, filters, roles, password } = req.body
+    const { id, username, password, description, rating } = req.body
 
     // Confirm data 
-    if (!id || !username || !Array.isArray(filters) || !filters.length || !Array.isArray(roles) || !roles.length) {
-        return res.status(400).json({ message: 'All fields except password are required' })
+    if (!id || !username) {
+        return res.status(400).json({ message: 'All fields except password, decription, and rating are required' })
     }
 
     // Does the user exist to update?
@@ -63,8 +63,8 @@ const updateUser = asyncHandler (async(req, res) => {
     }
 
     user.username = username
-    user.filters = filters
-    user.roles = roles
+    user.description = description
+    user.rating = rating;
 
     if (password) {
         // Hash password 

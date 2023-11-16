@@ -9,17 +9,13 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    filters: [{
+    description: {
         type: String,
-        default: "all"
-    }],
-    roles: [{
-        type: String,
-        default: "user"
-    }],
-    active: {
-        type: Boolean,
-        default: true
+        default: "This user has not added a description yet"
+    },
+    rating: {
+        type: Number,
+        default: 5
     }
 })
 
