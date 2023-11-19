@@ -1,6 +1,8 @@
 const User = require('../models/User')
 const asyncHandler = require('express-async-handler')
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken');
+
 
 const getAllusers = asyncHandler (async(req, res) => {
     const users = await User.find().select('-password').lean()
@@ -12,7 +14,7 @@ const getAllusers = asyncHandler (async(req, res) => {
 
 
 const createNewUser = asyncHandler (async(req, res) => {
-    const { username, password, description, rating} = req.body
+    const { username, password, description, rating, classes, conversations, availability} = req.body;
 
     if(!username || !password){
         return res.status(400).json({ message: 'All fields are required!'})
@@ -26,7 +28,7 @@ const createNewUser = asyncHandler (async(req, res) => {
     }
 
     const hashedPwd = await bcrypt.hash(password, 10)
-    const userObject = {username, "password" : hashedPwd, description, rating}
+    const userObject = {username, "password" : hashedPwd, description, rating, classes, conversations, availability}
 
     //Create and store the new user
     const user = await User.create(userObject)
@@ -99,9 +101,33 @@ const deleteUser = asyncHandler (async(req, res) => {
     res.json(reply)
 })
 
+const loginUser = asyncHandler(async (req, res) => {
+    const { username, password } = req.body;
+
+    const user = await User.findOne({ username });
+
+    if (user && await bcrypt.compare(password, user.password)) {
+        // User found and password matches
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+            expiresIn: '1d' // Token expires in 1 day
+        });
+
+        res.json({
+            message: 'Login successful',
+            token,
+            username: user.username,
+            userId: user._id
+        });
+    } else {
+        res.status(401).json({ message: 'Invalid credentials' });
+    }
+});
+
+
 module.exports = {
     getAllusers,
     createNewUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    loginUser
 }

@@ -1,4 +1,5 @@
-const mongoose = require ('mongoose')
+const mongoose = require('mongoose');
+const Message = require('./Message'); // Import the Message model
 
 const userSchema = new mongoose.Schema({
     username: {
@@ -16,7 +17,19 @@ const userSchema = new mongoose.Schema({
     rating: {
         type: Number,
         default: 5
-    }
-})
+    },
+    classes: [{
+        type: String,
+        default: ["ECS3354"]
+    }],
+    conversations: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Message'
+    }],
+    availability: [{
+        type: String,
+        enum: ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY']
+    }]
+});
 
-module.exports = mongoose.model('User', userSchema)
+module.exports = mongoose.model('User', userSchema);

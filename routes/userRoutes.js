@@ -8,4 +8,7 @@ router.route('/')
     .patch(usersController.updateUser)
     .delete(usersController.deleteUser)
 
-    module.exports = router
+// Add login route
+router.post('/login', usersController.loginUser);
+
+module.exports = router
