@@ -13,9 +13,9 @@ const getAllusers = asyncHandler (async(req, res) => {
 })
 
 const getOneuser = asyncHandler (async(req, res) => {
-    const { id } = req.body;
+    const { username } = req.body;
 
-    const user = await User.findById(id).exec()
+    user = await User.findOne({ username }).lean().exec()
     
     if(user){
         res.json(user)
