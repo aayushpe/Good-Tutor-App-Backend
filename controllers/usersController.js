@@ -52,6 +52,22 @@ const createNewUser = asyncHandler (async(req, res) => {
     }
 })
 
+const updateRating = asyncHandler (async(req, res) => {
+    const { id, rating } = req.body
+    const user = await User.findById(id).exec()
+    console.dir(user)
+
+    if (!user) {
+        return res.status(400).json({ message: 'User not found' })
+    }
+
+    user.rating = rating
+
+    const updatedUser = await user.save()
+    res.json({ message: `${updatedUser.username}'s rating has changed!` })
+
+})
+
 
 const updateUser = asyncHandler (async(req, res) => {
     const { id, username, password, description, rating } = req.body
@@ -140,6 +156,7 @@ module.exports = {
     getAllusers,
     getOneuser,
     createNewUser,
+    updateRating,
     updateUser,
     deleteUser,
     loginUser

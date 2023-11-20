@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema({
     }],
     availability: [{
         type: String,
-        enum: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+        default: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
     }],
     reviews: [{
         type: mongoose.Schema.Types.ObjectId,
