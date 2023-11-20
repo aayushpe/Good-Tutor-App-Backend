@@ -6,56 +6,79 @@ const Conversation = require('../models/Conversation'); // Import your Conversat
 const startConversation = asyncHandler(async (req, res) => {
     const { senderId, recipientId } = req.body;
 
-    // Logic to create a new conversation
-    const newConversation = new Conversation({
-        participants: [senderId, recipientId],
-        messages: [] // Assuming your conversation model has a messages array
+    // Check if a conversation between these two users already exists
+    let conversation = await Conversation.findOne({
+        participants: { $all: [senderId, recipientId] }
     });
 
-    await newConversation.save();
+    if (!conversation) {
+        // If not, create a new conversation
+        conversation = new Conversation({
+            participants: [senderId, recipientId],
+            messages: [] // Start with an empty messages array
+        });
+        await conversation.save();
 
-    // Update users' conversations
-    await User.updateOne({ _id: senderId }, { $push: { conversations: newConversation._id } });
-    await User.updateOne({ _id: recipientId }, { $push: { conversations: newConversation._id } });
+        // Update users' conversations
+        await User.updateOne({ _id: senderId }, { $push: { conversations: conversation._id } });
+        await User.updateOne({ _id: recipientId }, { $push: { conversations: conversation._id } });
+    }
 
-    res.status(201).json({ message: 'Conversation started', data: newConversation });
+    res.status(201).json({ message: 'Conversation started', data: conversation });
 });
 
 
-// Function to send a message
+
 const sendMessage = asyncHandler(async (req, res) => {
     const { conversationId, senderId, content } = req.body;
 
+    // Retrieve the conversation to find the other participant (recipient)
+    const conversation = await Conversation.findById(conversationId);
+    if (!conversation) {
+        return res.status(404).json({ message: 'Conversation not found' });
+    }
+
+    // Assuming a two-participant conversation model
+    const recipientId = conversation.participants.find(participant => participant.toString() !== senderId);
+
     // Create the message
-    const message = await Message.create({
+    const message = new Message({
         sender: senderId,
-        recipient: conversationId, // Assuming this is a group chat and the recipient is the conversation ID
+        recipient: recipientId,
         content
     });
+
+    await message.save();
 
     // Add the message to the conversation's messages array
     const updatedConversation = await Conversation.findByIdAndUpdate(
         conversationId,
         { $push: { messages: message._id } },
         { new: true }
-    );
+    ).populate({
+        path: 'messages',
+        populate: { path: 'sender recipient' }
+    });
 
-    if (!updatedConversation) {
-        return res.status(404).json({ message: 'Conversation not found' });
-    }
-
-    res.status(201).json({ message: 'Message sent successfully', data: message });
+    res.status(201).json({ message: 'Message sent successfully', data: updatedConversation });
 });
+
 
 
 
 // Function to get user conversations
 const getUserConversations = asyncHandler(async (req, res) => {
     const { userId } = req.params;
-    const user = await User.findById(userId).populate('conversations');
+    const userConversations = await Conversation.find({
+        participants: userId
+    }).populate({
+        path: 'messages',
+        populate: { path: 'sender' } // Further populate the sender of each message
+    });
 
-    res.status(200).json({ message: 'Conversations retrieved successfully', data: user.conversations });
+    res.status(200).json({ message: 'Conversations retrieved successfully', data: userConversations });
 });
+
 
 module.exports = {
     sendMessage,
