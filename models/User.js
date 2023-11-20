@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Message = require('./Message'); // Import the Message model
+const Review = require('./Review'); // Import the Message model
 
 const userSchema = new mongoose.Schema({
     username: {
@@ -24,11 +25,15 @@ const userSchema = new mongoose.Schema({
     }],
     conversations: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Message'
+        ref: 'Conversation'
     }],
     availability: [{
         type: String,
         enum: ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY']
+    }],
+    reviews: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Review'
     }]
 });
 

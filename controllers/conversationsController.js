@@ -14,24 +14,40 @@ const startConversation = asyncHandler(async (req, res) => {
 
     await newConversation.save();
 
+    // Update users' conversations
+    await User.updateOne({ _id: senderId }, { $push: { conversations: newConversation._id } });
+    await User.updateOne({ _id: recipientId }, { $push: { conversations: newConversation._id } });
+
     res.status(201).json({ message: 'Conversation started', data: newConversation });
 });
 
-module.exports = {
-    // ... other methods,
-    startConversation
-};
 
 // Function to send a message
 const sendMessage = asyncHandler(async (req, res) => {
-    const { senderId, recipientId, content } = req.body;
+    const { conversationId, senderId, content } = req.body;
 
-    const message = await Message.create({ sender: senderId, recipient: recipientId, content });
-    await User.updateOne({ _id: senderId }, { $push: { conversations: message._id } });
-    await User.updateOne({ _id: recipientId }, { $push: { conversations: message._id } });
+    // Create the message
+    const message = await Message.create({
+        sender: senderId,
+        recipient: conversationId, // Assuming this is a group chat and the recipient is the conversation ID
+        content
+    });
+
+    // Add the message to the conversation's messages array
+    const updatedConversation = await Conversation.findByIdAndUpdate(
+        conversationId,
+        { $push: { messages: message._id } },
+        { new: true }
+    );
+
+    if (!updatedConversation) {
+        return res.status(404).json({ message: 'Conversation not found' });
+    }
 
     res.status(201).json({ message: 'Message sent successfully', data: message });
 });
+
+
 
 // Function to get user conversations
 const getUserConversations = asyncHandler(async (req, res) => {
