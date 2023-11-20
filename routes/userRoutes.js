@@ -9,8 +9,10 @@ router.route('/')
     .delete(usersController.deleteUser)
 
 // Add login route
-router.post('/login', usersController.loginUser);
+router.post('/login', usersController.loginUser)
 
 router.get('/getone', usersController.getOneuser)
+
+router.patch('/updaterating', usersController.updateRating)
 
 module.exports = router
