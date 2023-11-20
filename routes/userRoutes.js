@@ -11,4 +11,6 @@ router.route('/')
 // Add login route
 router.post('/login', usersController.loginUser);
 
+router.get('/getone', usersController.getOneuser)
+
 module.exports = router

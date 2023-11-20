@@ -12,6 +12,18 @@ const getAllusers = asyncHandler (async(req, res) => {
     res.json(users)
 })
 
+const getOneuser = asyncHandler (async(req, res) => {
+    const { id } = req.body;
+
+    const user = await User.findById(id).exec()
+    
+    if(user){
+        res.json(user)
+    } else {
+        return res.status(400).json({ message: 'No user found'})
+    }
+
+})
 
 const createNewUser = asyncHandler (async(req, res) => {
     const { username, password, description, rating, classes, conversations, availability} = req.body;
@@ -126,6 +138,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
 module.exports = {
     getAllusers,
+    getOneuser,
     createNewUser,
     updateUser,
     deleteUser,
