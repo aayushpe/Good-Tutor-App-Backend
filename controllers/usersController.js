@@ -28,7 +28,7 @@ const getOneuser = asyncHandler (async(req, res) => {
 
 
 const createNewUser = asyncHandler (async(req, res) => {
-    const { username, password, description, rating, classes, conversations, availability} = req.body;
+    const { username, password, description, rating, classes, conversations, availability, comments} = req.body;
 
     if(!username || !password){
         return res.status(400).json({ message: 'All fields are required!'})
@@ -42,7 +42,7 @@ const createNewUser = asyncHandler (async(req, res) => {
     }
 
     const hashedPwd = await bcrypt.hash(password, 10)
-    const userObject = {username, "password" : hashedPwd, description, rating, classes, conversations, availability}
+    const userObject = {username, "password" : hashedPwd, description, rating, classes, conversations, availability, comments}
 
     //Create and store the new user
     const user = await User.create(userObject)
@@ -54,25 +54,30 @@ const createNewUser = asyncHandler (async(req, res) => {
     }
 })
 
-const updateRating = asyncHandler (async(req, res) => {
-    const { id, rating } = req.body
-    const user = await User.findById(id).exec()
-    console.dir(user)
+const updateRating = asyncHandler(async (req, res) => {
+    const { id, comments, rating } = req.body;
 
-    if (!user) {
-        return res.status(400).json({ message: 'User not found' })
+    try {
+        const tutor = await User.findById(id).exec();
+
+        if (!tutor) {
+            return res.status(404).json({ message: 'Tutor not found' });
+        }
+        tutor.comments.push(comments)
+        tutor.rating.push(rating)
+
+        const updatedUser = await tutor.save()
+        res.json({ message: `${updatedUser.username}'s rating has been changed`})
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
     }
-
-    user.rating = rating
-
-    const updatedUser = await user.save()
-    res.json({ message: `${updatedUser.username}'s rating has changed!` })
-
-})
+});
 
 
 const updateUser = asyncHandler (async(req, res) => {
-    const { id, username, password, description, rating } = req.body
+    const { id, username, password, description, rating, comments } = req.body
 
     // Confirm data 
     if (!id || !username) {
@@ -96,7 +101,8 @@ const updateUser = asyncHandler (async(req, res) => {
 
     user.username = username
     user.description = description
-    user.rating = rating;
+    user.rating = rating
+    user.comments = comments
 
     if (password) {
         // Hash password 
