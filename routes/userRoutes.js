@@ -15,4 +15,6 @@ router.get('/getone', usersController.getOneuser)
 
 router.patch('/updaterating', usersController.updateRating)
 
+router.patch('/updaterating', usersController.updateRating)
+
 module.exports = router

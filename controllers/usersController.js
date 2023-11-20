@@ -25,6 +25,8 @@ const getOneuser = asyncHandler (async(req, res) => {
 
 })
 
+
+
 const createNewUser = asyncHandler (async(req, res) => {
     const { username, password, description, rating, classes, conversations, availability} = req.body;
 
@@ -159,5 +161,6 @@ module.exports = {
     updateRating,
     updateUser,
     deleteUser,
-    loginUser
+    loginUser,
+    updateRating
 }
