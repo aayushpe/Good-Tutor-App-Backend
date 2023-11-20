@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { boolean } = require('webidl-conversions');
 
 const messageSchema = new mongoose.Schema({
     sender: {
@@ -13,6 +14,11 @@ const messageSchema = new mongoose.Schema({
     },
     content: {
         type: String,
+        required: true
+    },
+    deliveryStatus: {
+        type: Boolean,
+        default: false,
         required: true
     }
 });

@@ -4,7 +4,7 @@ const asyncHandler = require('express-async-handler');
 const Conversation = require('../models/Conversation'); // Import your Conversation model
 
 const startConversation = asyncHandler(async (req, res) => {
-    const { senderId, recipientId } = req.body;
+    const { senderId, recipientId, recipientUserName } = req.body;
 
     // Check if a conversation between these two users already exists
     let conversation = await Conversation.findOne({
@@ -14,6 +14,7 @@ const startConversation = asyncHandler(async (req, res) => {
     if (!conversation) {
         // If not, create a new conversation
         conversation = new Conversation({
+            conversationTitle: recipientUserName, // Set the title based on the recipient's username
             participants: [senderId, recipientId],
             messages: [] // Start with an empty messages array
         });
@@ -26,6 +27,7 @@ const startConversation = asyncHandler(async (req, res) => {
 
     res.status(201).json({ message: 'Conversation started', data: conversation });
 });
+
 
 
 
@@ -45,7 +47,8 @@ const sendMessage = asyncHandler(async (req, res) => {
     const message = new Message({
         sender: senderId,
         recipient: recipientId,
-        content
+        content,
+        deliveryStatus: true
     });
 
     await message.save();
