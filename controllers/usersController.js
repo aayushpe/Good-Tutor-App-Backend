@@ -12,19 +12,17 @@ const getAllusers = asyncHandler (async(req, res) => {
     res.json(users)
 })
 
-const getOneuser = asyncHandler (async(req, res) => {
-    const { username } = req.body;
+const getOneuser = asyncHandler(async (req, res) => {
+    const { username } = req.query;
 
-    user = await User.findOne({ username }).lean().exec()
+    const user = await User.findOne({ username }).lean().exec();
     
-    if(user){
-        res.json(user)
+    if (user) {
+        res.json(user);
     } else {
-        return res.status(400).json({ message: 'No user found'})
+        return res.status(400).json({ message: 'No user found' });
     }
-
-})
-
+});
 
 
 const createNewUser = asyncHandler (async(req, res) => {
