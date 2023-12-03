@@ -26,7 +26,7 @@ const getOneuser = asyncHandler(async (req, res) => {
 
 
 const createNewUser = asyncHandler (async(req, res) => {
-    const { username, password, description, rating, classes, conversations, availability, comments} = req.body;
+    const { username, password, description, rating, classes, conversations, availability, comments, role} = req.body;
 
     if(!username || !password){
         return res.status(400).json({ message: 'All fields are required!'})
@@ -40,7 +40,7 @@ const createNewUser = asyncHandler (async(req, res) => {
     }
 
     const hashedPwd = await bcrypt.hash(password, 10)
-    const userObject = {username, "password" : hashedPwd, description, rating, classes, conversations, availability, comments}
+    const userObject = {username, "password" : hashedPwd, description, rating, classes, conversations, availability, comments, role}
 
     //Create and store the new user
     const user = await User.create(userObject)

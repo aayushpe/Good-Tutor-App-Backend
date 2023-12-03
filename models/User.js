@@ -34,7 +34,11 @@ const userSchema = new mongoose.Schema({
     availability: [{
         type: String,
         default: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-    }]
+    }],
+    role : {
+        type: Number,
+        default: 0
+    }
 });
 
 module.exports = mongoose.model('User', userSchema)
