@@ -75,7 +75,7 @@ const updateRating = asyncHandler(async (req, res) => {
 
 
 const updateUser = asyncHandler (async(req, res) => {
-    const { id, username, password, description, rating, comments } = req.body
+    const { id, username, password, description, rating, comments, availability } = req.body
 
     // Confirm data 
     if (!id || !username) {
@@ -101,6 +101,7 @@ const updateUser = asyncHandler (async(req, res) => {
     user.description = description
     user.rating = rating
     user.comments = comments
+    user.availability = availability
 
     if (password) {
         // Hash password 
