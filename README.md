@@ -20,4 +20,4 @@ node index.js or nodemon index.js
 
 In order to start the server
 
-API endpoints should be active and listening on port 3500 of your machine
+API endpoints should be active and listening on port 3500 of your machine, test this by entering http://localhost:3500 to view it in your browser.
