@@ -11,6 +11,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    email:{
+        type: String,
+        default: "This user did not add an email."
+    },
     description: {
         type: String,
         default: "This user has not added a description yet"
@@ -39,6 +43,8 @@ const userSchema = new mongoose.Schema({
         type: Number,
         default: 0
     }
+
+    
 });
 
 module.exports = mongoose.model('User', userSchema)

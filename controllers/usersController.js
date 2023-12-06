@@ -26,7 +26,7 @@ const getOneuser = asyncHandler(async (req, res) => {
 
 
 const createNewUser = asyncHandler (async(req, res) => {
-    const { username, password, description, rating, classes, conversations, availability, comments, role} = req.body;
+    const { username, password, description, rating, classes, conversations, availability, comments, role, email} = req.body;
 
     if(!username || !password){
         return res.status(400).json({ message: 'All fields are required!'})
@@ -40,7 +40,7 @@ const createNewUser = asyncHandler (async(req, res) => {
     }
 
     const hashedPwd = await bcrypt.hash(password, 10)
-    const userObject = {username, "password" : hashedPwd, description, rating, classes, conversations, availability, comments, role}
+    const userObject = {username, "password" : hashedPwd, description, rating, classes, conversations, availability, comments, role, email}
 
     //Create and store the new user
     const user = await User.create(userObject)
@@ -75,49 +75,56 @@ const updateRating = asyncHandler(async (req, res) => {
 
 
 const updateUser = asyncHandler (async(req, res) => {
-    const { id, username, password, description, rating, comments, availability } = req.body
+    const { id, username, password, description, rating, comments, availability, email } = req.body;
 
     // Confirm data 
     if (!id) {
-        return res.status(400).json({ message: 'KD field required except password, decription, and rating are required' })
+        return res.status(400).json({ message: 'ID field required' });
     }
 
     // Does the user exist to update?
-    const user = await User.findById(id).exec()
+    const user = await User.findById(id).exec();
 
     if (!user) {
-        return res.status(400).json({ message: 'User not found' })
+        return res.status(400).json({ message: 'User not found' });
     }
 
-    // Check for duplicate 
-    const duplicate = await User.findOne({ username }).lean().exec()
+    // Check for duplicate username
+    const duplicate = await User.findOne({ username }).lean().exec();
 
     // Allow updates to the original user 
     if (duplicate && duplicate?._id.toString() !== id) {
-        return res.status(409).json({ message: 'Duplicate username' })
+        return res.status(409).json({ message: 'Duplicate username' });
     }
 
-    user.username = username
-    user.description = description
-    user.rating = rating
-    user.comments = comments
-    user.availability = availability
+    user.username = username;
+    user.description = description;
+    user.rating = rating;
+    user.comments = comments;
+    user.availability = availability;
+    user.email = email;
 
-    
-    new_pass = await bcrypt.hash(password, 10);
+    // Check if the new password is different from the old one
+    if (password) {
+        const isSamePassword = await bcrypt.compare(password, user.password);
+        if (isSamePassword) {
+            return res.status(409).json({ message: 'New password must be different from the current one' });
+        }
 
-    if (password && user.password != new_pass) {
-        // Hash password 
-        user.password = new_pass; // salt rounds 
+        // Hash the new password
+        const hashedPwd = await bcrypt.hash(password, 10);
+        user.password = hashedPwd;
     }
-    else{
-        return res.status(409).json({ message: 'Duplicate password' })
-    }
 
-    const updatedUser = await user.save()
+    const updatedUser = await user.save();
 
-    res.json({ message: `${updatedUser.username} updated` })
-})
+    // Return the updated user data without the password field
+    const userWithoutPassword = updatedUser.toObject();
+    delete userWithoutPassword.password;
+
+    res.json({ message: `${updatedUser.username} updated`, user: userWithoutPassword });
+});
+
 
 
 const deleteUser = asyncHandler (async(req, res) => {
