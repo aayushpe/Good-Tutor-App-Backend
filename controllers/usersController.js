@@ -78,8 +78,8 @@ const updateUser = asyncHandler (async(req, res) => {
     const { id, username, password, description, rating, comments, availability } = req.body
 
     // Confirm data 
-    if (!id || !username) {
-        return res.status(400).json({ message: 'All fields except password, decription, and rating are required' })
+    if (!id) {
+        return res.status(400).json({ message: 'KD field required except password, decription, and rating are required' })
     }
 
     // Does the user exist to update?
@@ -103,9 +103,15 @@ const updateUser = asyncHandler (async(req, res) => {
     user.comments = comments
     user.availability = availability
 
-    if (password) {
+    
+    new_pass = await bcrypt.hash(password, 10);
+
+    if (password && user.password != new_pass) {
         // Hash password 
-        user.password = await bcrypt.hash(password, 10) // salt rounds 
+        user.password = new_pass; // salt rounds 
+    }
+    else{
+        return res.status(409).json({ message: 'Duplicate password' })
     }
 
     const updatedUser = await user.save()

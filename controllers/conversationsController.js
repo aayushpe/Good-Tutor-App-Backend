@@ -83,8 +83,19 @@ const getUserConversations = asyncHandler(async (req, res) => {
 });
 
 
+const getUsername = asyncHandler(async (req, res) => {
+    const { userId } = req.params;
+    const user = await User.findById(userId);
+    if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json({ username: user.username });
+});
+
+
 module.exports = {
     sendMessage,
     getUserConversations,
-    startConversation
+    startConversation,
+    getUsername 
 };
