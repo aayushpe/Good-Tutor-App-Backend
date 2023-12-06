@@ -14,6 +14,10 @@ npm install
 A .env file needs to be created including for the database URI, the JWT secret token and the Node eviroment value.
 The last of which can be set to NODE_ENV=Development.
 
-run the command with node index.js or nodemon index.js
+run the command 
 
-API endpoints should be listening on port 3500 of your machine
+node index.js or nodemon index.js
+
+In order to start the server
+
+API endpoints should be active and listening on port 3500 of your machine
