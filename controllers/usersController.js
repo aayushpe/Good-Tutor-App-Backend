@@ -75,7 +75,7 @@ const updateRating = asyncHandler(async (req, res) => {
 
 
 const updateUser = asyncHandler (async(req, res) => {
-    const { id, username, password, description, rating, comments, availability, email } = req.body;
+    const { id, username, password, description, rating, comments, availability, email, classes } = req.body;
 
     // Confirm data 
     if (!id) {
@@ -103,6 +103,7 @@ const updateUser = asyncHandler (async(req, res) => {
     user.comments = comments;
     user.availability = availability;
     user.email = email;
+    user.classes = classes;
 
     // Check if the new password is different from the old one
     if (password) {
