@@ -31,12 +31,12 @@ npm install
 Create a `.env` file in the project root directory. Inside the `.env` file, include the following information:
 
 ```env
-DB_URI=your_database_uri
-JWT_SECRET=your_jwt_secret_token
 NODE_ENV=Development
+DATABASE_URI=your_mongodbAtlas_database_uri
+JWT_SECRET=your_jwt_secret_token
 ```
 
-Make sure to replace `your_database_uri` and `your_jwt_secret_token` with your actual database URI and JWT secret token.
+Make sure to replace `your_mongodbAtlas_database_uri` and `your_jwt_secret_token` with your actual database URI and JWT secret token.
 
 ### 5. Run the Server
 
